@@ -93,7 +93,7 @@ void loop()
 } 
 
 
-// The function of finding the doubleing
+// The function of finding the doubling
 ECpoint ECDouble(ECpoint Q, int A, BigNumber P)
 {
   BigNumber s1,AC1,AC2,AC3,p1;

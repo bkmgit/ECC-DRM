@@ -23,8 +23,8 @@ void setup()
 
 
 
-BigNumber x = "11";
-BigNumber y = "9";
+BigNumber x = "1932121325234534534534534534554353485634868468344545435342121";
+BigNumber y = "1332123455345345345345345343957235923759237534534534534515";
 BigNumber z = "1";
 BigNumber w, mod;
 
@@ -32,7 +32,8 @@ z = x/y;
 w = z*y;
 mod = x-w;
 Serial.println(mod);
-
+w = modulus(x,y);
+Serial.println(w);
 Serial.println("++++++++++++++++++++++++++++++++++++++++++");
 //int q = inverse(b);
 BigNumber q = "0";
@@ -72,19 +73,18 @@ Serial.println("------------------------------");
 
 
  String binstr;
- BigNumber P = "1111";
+ BigNumber P = "11111";
  
- binstr = "111111111111111111111";
  int A=-3;
  int intKLen=25;
  
 
   BigNumber chGx,chGy;
-   chGx    = "2733";
-   chGy    = "7034";
-    ECpoint Qs,Rs,Q, R;
-    Qs.x = chGx; 
-    Qs.y = chGy;
+  chGx    = "84749";
+  chGy    = "53526";
+  ECpoint Qs,Rs,Q, R;
+  Qs.x = chGx; 
+  Qs.y = chGy;
 // Serial.println((int)(chGx + chGy));
  Serial.println("Start Scalar Multiplications......");
 
@@ -126,10 +126,10 @@ ECpoint ECDouble(ECpoint Q, int A, BigNumber P)
   ECpoint R;
   AC1 = Q.x * "3";
   AC2 = Q.y * "2";
-  //Serial.println(AC2);
+  Serial.println(AC2);
 
   AC3 = inverse(AC2,P);
-  Serial.println(AC3);
+  Serial.println("hehahahahhhahah");
 
  // s1 = ((AC1*Q.x) - (AA)) * AC3;
 
@@ -291,12 +291,14 @@ String padLeft(String str)
 
 BigNumber inverse(BigNumber a, BigNumber m)
 {
-  
-    a = a%m; 
+    Serial.println("inverse function......");
+    a = modulus(a,m);
+     
+    Serial.println(a);
     for (BigNumber x= 1; x<m; x++) 
     {
         if (modulus((a*x),m) == 1) 
-        {        Serial.println(x);
+        {        //Serial.println(x);
           return x;
         }
     }
@@ -305,12 +307,16 @@ BigNumber inverse(BigNumber a, BigNumber m)
 
 BigNumber modulus(BigNumber x, BigNumber y)
 {
- 
+
  BigNumber z ;
  BigNumber w, mod;
 
+
  z = x/y;
+
  w = z*y;
+   // Serial.print("modulus function....");
+
  mod = x-w;
  return mod;
 }

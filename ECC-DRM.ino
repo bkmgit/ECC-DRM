@@ -1,6 +1,5 @@
 
 #include "BigNumber.h"
-static int DIGITS=0;
 
 
 // The strcture of the point in Elliptic Curve (EC)
@@ -15,12 +14,40 @@ ECpoint ECDouble(ECpoint Q, int A, BigNumber P);
 ECpoint ECAdd(ECpoint Q,ECpoint G, BigNumber P);
 ECpoint ECSub(ECpoint Q,ECpoint G, BigNumber P);
 String* Convert_To_DRM(BigNumber num, String bin);
-
-
+BigNumber inverse(BigNumber a, BigNumber m);
+BigNumber modulus(BigNumber xx, BigNumber yy);
 
 void setup()
 {
  Serial.begin(9600);
+
+
+
+BigNumber x = "11";
+BigNumber y = "9";
+BigNumber z = "1";
+BigNumber w, mod;
+
+z = x/y;
+w = z*y;
+mod = x-w;
+Serial.println(mod);
+
+Serial.println("++++++++++++++++++++++++++++++++++++++++++");
+//int q = inverse(b);
+BigNumber q = "0";
+q = inverse(x,y);
+Serial.println(q);
+Serial.println("++++++++++++++++++++++++++++++++++++++++++");
+
+
+
+
+
+
+
+
+
 
  
  // Converting BigNumber to Binary
@@ -45,14 +72,13 @@ Serial.println("------------------------------");
 
 
  String binstr;
- BigNumber P = "111111111111111111111111111111";
+ BigNumber P = "1111";
  
  binstr = "111111111111111111111";
  int A=-3;
  int intKLen=25;
  
 
- Serial.println("End....");
   BigNumber chGx,chGy;
    chGx    = "2733";
    chGy    = "7034";
@@ -60,51 +86,66 @@ Serial.println("------------------------------");
     Qs.x = chGx; 
     Qs.y = chGy;
 // Serial.println((int)(chGx + chGy));
- Serial.println("");
+ Serial.println("Start Scalar Multiplications......");
 
  for (int i=0;i<keysize;i++)
- { Serial.println(DRMs[i]);
+ { 
+   Serial.println(DRMs[i]);
    if (DRMs[i] == "1")
     {
-         Rs=ECAdd(Rs,Qs, P); //adds++;
-         Serial.println("helllll");
+           //Rs=ECAdd(Rs,Qs, P); //adds++;
+        Serial.println("");
     }
     else if (DRMs[i] == "-1")
     {
-      //  Rs=ECSub(Rs,Qs,P); //subs++;
-          Serial.println("hihhhhhhhhhhhhhhhhh");
+         // Rs=ECSub(Rs,Qs,P); //subs++;
+         Serial.println("");
     }
-    // Qs = ECDouble(Qs,A, P);//dubs++;
+     Qs = ECDouble(Qs,A, P);//dubs++;
      
 
-  Serial.println(Qs.x);
+  //Serial.println(Qs.x);
  }
 
- 
-  //BigNumber  number="2";
-  //BigNumber  x = "2";
-  //Serial.println (number+x);
+ Serial.println("End Scalar Multiplication...");
+
 }
+
+
 
 
 void loop()
 {
+}
 
-} 
-
-
-// The function of finding the doubling
+// The function of finding the doubleing
 ECpoint ECDouble(ECpoint Q, int A, BigNumber P)
 {
-  BigNumber s1,AC1,AC2,AC3,p1;
+  BigNumber AA = "1";
+  BigNumber s1,AC1,AC2,AC3;
   ECpoint R;
-  AC1=Q.x*(BigNumber)3;
-  AC2=Q.y*(BigNumber)2;
-  AC3= 0;//(AC2^-1)%P;
-  s1 = (((AC1*Q.x)+(BigNumber)A)*AC3);
-  R.x = (s1*s1-Q.x-Q.x)%P;
+  AC1 = Q.x * "3";
+  AC2 = Q.y * "2";
+  //Serial.println(AC2);
+
+  AC3 = inverse(AC2,P);
+  Serial.println(AC3);
+
+ // s1 = ((AC1*Q.x) - (AA)) * AC3;
+
+  BigNumber RR, RX = "0", RY;
+  RR = ((s1*s1)-(Q.x)-(Q.x));//% P;
+  
+  RX = modulus(RR, P);
+
+  Serial.println("");
+  Serial.println(RX);
+
+  
   R.y  = (s1*(Q.x-R.x)-Q.y)%P;
-  R.x=(R.x <0 ? R.x+P : R.x);R.y= (R.y<0 ? R.y+P : R.y);
+  R.x=(R.x <0 ? R.x+P : R.x);
+  R.y= (R.y<0 ? R.y+P : R.y);
+
   return R;
 }
 
@@ -113,15 +154,13 @@ ECpoint ECAdd(ECpoint Q,ECpoint G, BigNumber P)
 {
   BigNumber s1,AC1; 
   ECpoint R;
-  AC1= 0;//((Q.x^-1)%P)%P;
-  /*
+  AC1= ((Q.x^-1)%P)%P;
   Q.x = (Q.x-G.x)%P;
   Q.x=(Q.x<0 ? Q.x+P : R.x);
   s1 = (((Q.y-G.y)%P)*AC1)%P;
   R.x = ((s1*s1)%P-G.x-Q.x) % P;
   R.y = ((s1*(G.x-R.x))%P-G.y) % P;
   R.x=(R.x<0 ? R.x+P : R.x);R.y = (R.y<0 ? R.y+P : R.y);
-  */
   R.x = R.y = "0" ;
   return R;
 }
@@ -131,7 +170,7 @@ ECpoint ECSub(ECpoint Q,ECpoint G, BigNumber P)
 {
   BigNumber s1,AC1; 
   ECpoint R;
-  AC1= 0;//((Q.x^-1)%P)%P;
+  AC1= ((Q.x^-1)%P)%P;
   G.y = G.y %P;G.y=(G.y<0 ? G.y+P : G.y); 
   Q.x = (Q.x-G.x)%P;
   Q.x=(Q.x<0 ? Q.x+P : R.x);
@@ -139,7 +178,6 @@ ECpoint ECSub(ECpoint Q,ECpoint G, BigNumber P)
   R.x = ((s1*s1)%P-G.x-Q.x) % P;
   R.y = ((s1*(G.x-R.x))%P-G.y) % P;
   R.x=(R.x<0 ? R.x+P : R.x);R.y= (R.y<0 ? R.y+P : R.y);
-  //cout<<"hiii"<<endl;
   return R;
 }
 
@@ -194,7 +232,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
       Serial.print(str1[j]);
   }
   for(int i = 0; i<len_str2; i++)
-        {
+  {
       if (str2[i] == '0')
       {
         DRM[j+i] = "0";
@@ -205,7 +243,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
         DRM[j+i] = "-1";
         //Serial.print("-1");
       }
-        }
+   }
           
     Serial.println("");
     return DRM;
@@ -216,34 +254,71 @@ String* Convert_To_DRM(BigNumber num, String bin)
 
 
 
-String convertBigNumberToBinary(BigNumber bn){
-
+String convertBigNumberToBinary(BigNumber bn)
+{
   BigNumber multiplier = BigNumber(16);
   BigNumber remainder;
   BigNumber result ;
   String finalHex;
-  while(bn !=0){
+  while(bn !=0)
+  {
     result = bn / multiplier;
     remainder = bn - (result *  multiplier);
     //Serial.println(remainder);
     //Serial.println(String((int)remainder,BIN));
     String newString = padLeft(String((int)remainder,BIN));
-    
     newString.concat(finalHex);
     finalHex = newString;
     bn = result;
-    //Serial.println(finalHex);
-    }
-  return finalHex;
   }
+  return finalHex;
+}
 
 
 
-String padLeft(String str){
-  while(str.length() < 4){
+String padLeft(String str)
+{
+  while(str.length() < 4)
+  {
     String zeroString = "0";
     zeroString.concat(str);
     str = zeroString;
-    }
-    return str;
   }
+    return str;
+}
+
+
+
+BigNumber inverse(BigNumber a, BigNumber m)
+{
+  
+    a = a%m; 
+    for (BigNumber x= 1; x<m; x++) 
+    {
+        if (modulus((a*x),m) == 1) 
+        {        Serial.println(x);
+          return x;
+        }
+    }
+}
+
+
+BigNumber modulus(BigNumber x, BigNumber y)
+{
+ 
+ BigNumber z ;
+ BigNumber w, mod;
+
+ z = x/y;
+ w = z*y;
+ mod = x-w;
+ return mod;
+}
+
+
+
+
+
+
+
+  

@@ -23,8 +23,8 @@ void setup()
 
 
 
-BigNumber x = "1932121325234534534534534534554353485634868468344545435342121";
-BigNumber y = "1332123455345345345345345343957235923759237534534534534515";
+BigNumber x = "171";
+BigNumber y = "131";
 BigNumber z = "1";
 BigNumber w, mod;
 
@@ -73,19 +73,21 @@ Serial.println("------------------------------");
 
 
  String binstr;
- BigNumber P = "11111";
+ BigNumber P = "1111111111111111111111111111111111";
+
  
  int A=-3;
  int intKLen=25;
  
 
   BigNumber chGx,chGy;
-  chGx    = "84749";
-  chGy    = "53526";
+  chGx    = "23423666767623649230234039473974937439473947";
+  chGy    = "53526237329562648200043434343434343434343438";
   ECpoint Qs,Rs,Q, R;
   Qs.x = chGx; 
   Qs.y = chGy;
-// Serial.println((int)(chGx + chGy));
+  Serial.println("Multiply = ");
+ Serial.println((chGx * chGy));
  Serial.println("Start Scalar Multiplications......");
 
  for (int i=0;i<keysize;i++)
@@ -126,25 +128,31 @@ ECpoint ECDouble(ECpoint Q, int A, BigNumber P)
   ECpoint R;
   AC1 = Q.x * "3";
   AC2 = Q.y * "2";
+  Serial.print("AC2 = ");
   Serial.println(AC2);
 
   AC3 = inverse(AC2,P);
-  Serial.println("hehahahahhhahah");
-
- // s1 = ((AC1*Q.x) - (AA)) * AC3;
+  Serial.print("AC3 = ");
+  Serial.println(AC3);
+  Serial.print("checking = ");
+  Serial.println(modulus((AC2 * AC3),P));
+  s1 = ((AC1*Q.x) - (AA)) * AC3;
 
   BigNumber RR, RX = "0", RY;
   RR = ((s1*s1)-(Q.x)-(Q.x));//% P;
-  
+    Serial.println("hehahahahhhahah");
+
   RX = modulus(RR, P);
 
-  Serial.println("");
+  Serial.print("RX = ");
   Serial.println(RX);
 
   
   R.y  = (s1*(Q.x-R.x)-Q.y)%P;
   R.x=(R.x <0 ? R.x+P : R.x);
   R.y= (R.y<0 ? R.y+P : R.y);
+  Serial.println("R.Y = ");
+  Serial.println(R.y);
 
   return R;
 }
@@ -296,13 +304,14 @@ BigNumber inverse(BigNumber a, BigNumber m)
      
     Serial.println(a);
     for (BigNumber x= 1; x<m; x++) 
-    {
-        if (modulus((a*x),m) == 1) 
-        {        //Serial.println(x);
+    {   //Serial.println("Hellooooooo");
+        if (modulus((a*x),m) == "1") 
+        {       
           return x;
         }
     }
 }
+
 
 
 BigNumber modulus(BigNumber x, BigNumber y)

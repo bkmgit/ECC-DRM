@@ -20,95 +20,90 @@ BigNumber modulus(BigNumber xx, BigNumber yy);
 void setup()
 {
  Serial.begin(9600);
+ BigNumber::begin ();  // initialize library
 
 
-
-BigNumber x = "171";
-BigNumber y = "131";
+BigNumber x = "963458368592368563485634895834573465346572371";
+BigNumber y = "165843658364586345834659384653459345834653831";
 BigNumber z = "1";
 BigNumber w, mod;
 
 z = x/y;
 w = z*y;
 mod = x-w;
-Serial.println(mod);
+//Serial.println(mod);
 w = modulus(x,y);
-Serial.println(w);
-Serial.println("++++++++++++++++++++++++++++++++++++++++++");
+//Serial.println(w);
+//Serial.println("++++++++++++++++++++++++++++++++++++++++++");
 //int q = inverse(b);
 BigNumber q = "0";
 q = inverse(x,y);
-Serial.println(q);
-Serial.println("++++++++++++++++++++++++++++++++++++++++++");
+//Serial.println(q);
+//Serial.println("++++++++++++++++++++++++++++++++++++++++++");
 
 
 
-
-
-
-
-
-
-
- 
  // Converting BigNumber to Binary
- Serial.println("Converting BigNumber to Binary .....");
- BigNumber numk = "681123288";
- String INTbin = String(numk, BIN);
+ Serial.println("Converting BigNumber to Binary.....");
+ BigNumber numk = "987235983483484388378946564888568654865834846842";
+ String INTbin = convertBigNumberToBinary(numk);
  Serial.println(INTbin);
  Serial.println("------------------------------");
+
  
  //Converting Binary to DRM
- int keysize = 31;
+ int keysize = 163;
  String* DRMs = new String[keysize];
+
  DRMs = Convert_To_DRM(numk,INTbin);
+
  for(int k = 0; k<keysize; k++)
    Serial.print(DRMs[k]);
 Serial.println("");
-Serial.println("------------------------------");
-
-
-
-
+Serial.println("--------------------------------");
 
 
  String binstr;
- BigNumber P = "1111111111111111111111111111111111";
-
+ BigNumber P = "11111111111111111111111111111111111111111";
  
- int A=-3;
- int intKLen=25;
- 
-
-  BigNumber chGx,chGy;
-  chGx    = "23423666767623649230234039473974937439473947";
-  chGy    = "53526237329562648200043434343434343434343438";
-  ECpoint Qs,Rs,Q, R;
-  Qs.x = chGx; 
-  Qs.y = chGy;
-  Serial.println("Multiply = ");
- Serial.println((chGx * chGy));
+ BigNumber A="-3";
+ //int intKLen=25;
+ BigNumber chGx,chGy;
+ chGx    = "2343434387493593453497594594359749579475495775984234";
+ chGy    = "7343249834834843883789465648885686548658348468486485";
+ ECpoint Qs,Rs,Q, R;
+ Qs.x = chGx; 
+ Qs.y = chGy;
+ //Serial.println("Multiply = ");
+ //Serial.println((chGx * chGy));
  Serial.println("Start Scalar Multiplications......");
 
  for (int i=0;i<keysize;i++)
  { 
-   Serial.println(DRMs[i]);
+   //Serial.println(DRMs[i]);
+   
    if (DRMs[i] == "1")
     {
-           //Rs=ECAdd(Rs,Qs, P); //adds++;
-        Serial.println("");
+           Rs=ECAdd(Rs,Qs,P); 
     }
     else if (DRMs[i] == "-1")
     {
-         // Rs=ECSub(Rs,Qs,P); //subs++;
-         Serial.println("");
+           Rs=ECSub(Rs,Qs,P); 
     }
-     Qs = ECDouble(Qs,A, P);//dubs++;
-     
+    
+           Qs = ECDouble(Qs,A,P);     
 
   //Serial.println(Qs.x);
+ 
  }
-
+ 
+ Serial.println("------------------------------------------------------");
+ 
+ Serial.println("The Result......");
+ Serial.print("Q.x = ");
+ Serial.println(Qs.x);
+ Serial.print("Q.y = ");
+ Serial.println(Qs.y);
  Serial.println("End Scalar Multiplication...");
 
 }
@@ -121,38 +116,30 @@ void loop()
 }
 
 // The function of finding the doubleing
-ECpoint ECDouble(ECpoint Q, int A, BigNumber P)
+ECpoint ECDouble(ECpoint Q, BigNumber A, BigNumber P)
 {
-  BigNumber AA = "1";
   BigNumber s1,AC1,AC2,AC3;
   ECpoint R;
   AC1 = Q.x * "3";
   AC2 = Q.y * "2";
-  Serial.print("AC2 = ");
-  Serial.println(AC2);
+  //Serial.print("Q.x = ");
+  //Serial.println(Q.x);
 
   AC3 = inverse(AC2,P);
-  Serial.print("AC3 = ");
-  Serial.println(AC3);
-  Serial.print("checking = ");
-  Serial.println(modulus((AC2 * AC3),P));
-  s1 = ((AC1*Q.x) - (AA)) * AC3;
-
+  AC3 = AC3%P;
+  //Serial.print("AC3 = ");
+  //Serial.println(AC3);
+  //Serial.print("checking = ");
+  //Serial.println(modulus((AC2 * AC3),P));
+  s1 = ((AC1*Q.x) + (A)) * AC3;
+  //Serial.print("s1 = ");
+  //Serial.println(s1);
   BigNumber RR, RX = "0", RY;
-  RR = ((s1*s1)-(Q.x)-(Q.x));//% P;
-    Serial.println("hehahahahhhahah");
-
-  RX = modulus(RR, P);
-
-  Serial.print("RX = ");
-  Serial.println(RX);
-
-  
+  R.x = ((s1*s1)-(Q.x)-(Q.x))% P;
   R.y  = (s1*(Q.x-R.x)-Q.y)%P;
-  R.x=(R.x <0 ? R.x+P : R.x);
-  R.y= (R.y<0 ? R.y+P : R.y);
-  Serial.println("R.Y = ");
-  Serial.println(R.y);
+  R.x=(R.x <0 ? R.x+P : R.x);R.y= (R.y<0 ? R.y+P : R.y);
+  //Serial.print("R.x = ");
+  //Serial.println(R.x);
 
   return R;
 }
@@ -169,7 +156,8 @@ ECpoint ECAdd(ECpoint Q,ECpoint G, BigNumber P)
   R.x = ((s1*s1)%P-G.x-Q.x) % P;
   R.y = ((s1*(G.x-R.x))%P-G.y) % P;
   R.x=(R.x<0 ? R.x+P : R.x);R.y = (R.y<0 ? R.y+P : R.y);
-  R.x = R.y = "0" ;
+  
+
   return R;
 }
 
@@ -186,6 +174,8 @@ ECpoint ECSub(ECpoint Q,ECpoint G, BigNumber P)
   R.x = ((s1*s1)%P-G.x-Q.x) % P;
   R.y = ((s1*(G.x-R.x))%P-G.y) % P;
   R.x=(R.x<0 ? R.x+P : R.x);R.y= (R.y<0 ? R.y+P : R.y);
+  //Serial.print("R.x = ");
+  //Serial.println(R.x);
   return R;
 }
 
@@ -199,21 +189,22 @@ String* Convert_To_DRM(BigNumber num, String bin)
   
   for(int x =0; x<bin.length(); x++)
   temp  = temp * "2";
- 
-  Serial.println();
-  
+    
   num2 = temp-num;
+  
   Serial.print("Num1 :");
   Serial.println(temp);
   Serial.print("Num2 :");
   Serial.println(num2);
-
+  
   String str1, str2;
   str1 = String(temp, BIN);
+  str1 = convertBigNumberToBinary(temp);
   Serial.print("Str1 :");
   Serial.println(str1);
 
   str2 = String(num2, BIN);
+  str2 = convertBigNumberToBinary(num2);
   Serial.print("Str2 :");
   Serial.println(str2);
   
@@ -222,6 +213,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
  
   len_str1 = str1.length();
   len_str2 = str2.length();
+  
   Serial.print("Str1_length :");
   Serial.println(len_str1);
   Serial.print("Str2_length :");
@@ -237,7 +229,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
   {
     bit = str1[j];
       DRM[j] = str1[j];
-      Serial.print(str1[j]);
+      //Serial.print(str1[j]);
   }
   for(int i = 0; i<len_str2; i++)
   {
@@ -253,7 +245,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
       }
    }
           
-    Serial.println("");
+    //Serial.println("");
     return DRM;
 }
 
@@ -299,19 +291,30 @@ String padLeft(String str)
 
 BigNumber inverse(BigNumber a, BigNumber m)
 {
-    Serial.println("inverse function......");
-    a = modulus(a,m);
+    //Serial.println("inverse function......");
+    BigNumber m0 = m; 
+    BigNumber y = 0, x = 1; 
+  
+    if (m == 1) 
+      return 0; 
+  
+    while (a > 1) 
+    { 
+        BigNumber q = a / m; 
+        BigNumber t = m; 
+  
+        m = modulus(a,m), a = t; //m = a % m
+        t = y; 
+        
+        y = x - q * y; 
+        x = t; 
+    } 
      
-    Serial.println(a);
-    for (BigNumber x= 1; x<m; x++) 
-    {   //Serial.println("Hellooooooo");
-        if (modulus((a*x),m) == "1") 
-        {       
-          return x;
-        }
-    }
+    if (x < 0) 
+       x += m0; 
+  
+    return x; 
 }
-
 
 
 BigNumber modulus(BigNumber x, BigNumber y)
@@ -320,14 +323,11 @@ BigNumber modulus(BigNumber x, BigNumber y)
  BigNumber z ;
  BigNumber w, mod;
 
-
  z = x/y;
-
  w = z*y;
-   // Serial.print("modulus function....");
-
  mod = x-w;
  return mod;
+ 
 }
 
 

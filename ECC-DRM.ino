@@ -42,17 +42,18 @@ q = inverse(x,y);
 //Serial.println("++++++++++++++++++++++++++++++++++++++++++");
 
 
-
  // Converting BigNumber to Binary
  Serial.println("Converting BigNumber to Binary.....");
- BigNumber numk = "987235983483484388378946564888568654865834846842";
+ BigNumber numk = "587235983553484388378941111888568654865834846841";
  String INTbin = convertBigNumberToBinary(numk);
+
+
  Serial.println(INTbin);
  Serial.println("------------------------------");
 
  
  //Converting Binary to DRM
- int keysize = 163;
+ int keysize = 100;
  String* DRMs = new String[keysize];
 
  DRMs = Convert_To_DRM(numk,INTbin);
@@ -67,10 +68,9 @@ Serial.println("--------------------------------");
  BigNumber P = "11111111111111111111111111111111111111111";
  
  BigNumber A="-3";
- //int intKLen=25;
  BigNumber chGx,chGy;
- chGx    = "2343434387493593453497594594359749579475495775984234";
- chGy    = "7343249834834843883789465648885686548658348468486485";
+ chGx    = "7343434387493593453497594594359749579475495775984234";
+ chGy    = "3343249834834843883789465648885686548658348468486485";
  ECpoint Qs,Rs,Q, R;
  Qs.x = chGx; 
  Qs.y = chGy;
@@ -80,6 +80,7 @@ Serial.println("--------------------------------");
 
  for (int i=0;i<keysize;i++)
  { 
+  /*
    //Serial.println(DRMs[i]);
    
    if (DRMs[i] == "1")
@@ -90,10 +91,10 @@ Serial.println("--------------------------------");
     {
            Rs=ECSub(Rs,Qs,P); 
     }
-    
+  */  
            Qs = ECDouble(Qs,A,P);     
-
-  //Serial.println(Qs.x);
+  
+  Serial.println(Qs.x);
  
  }
  
@@ -225,6 +226,7 @@ String* Convert_To_DRM(BigNumber num, String bin)
  
   byte bit;
   int j ;
+  //Serial.println(len_str1 - len_str2);
   for (j = 0; j < (len_str1 - len_str2); j++)
   {
     bit = str1[j];
@@ -262,14 +264,14 @@ String convertBigNumberToBinary(BigNumber bn)
   String finalHex;
   while(bn !=0)
   {
-    result = bn / multiplier;
-    remainder = bn - (result *  multiplier);
+      result = bn / multiplier;
+      remainder = bn - (result *  multiplier);
     //Serial.println(remainder);
     //Serial.println(String((int)remainder,BIN));
-    String newString = padLeft(String((int)remainder,BIN));
-    newString.concat(finalHex);
-    finalHex = newString;
-    bn = result;
+      String newString = padLeft(String((int)remainder,BIN));
+      newString.concat(finalHex);
+      finalHex = newString;
+      bn = result;
   }
   return finalHex;
 }

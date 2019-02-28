@@ -53,16 +53,15 @@ q = inverse(x,y);
 
  
  //Converting Binary to DRM
- int keysize = 100;
+ int keysize = 40;
  String* DRMs = new String[keysize];
 
  DRMs = Convert_To_DRM(numk,INTbin);
 
  for(int k = 0; k<keysize; k++)
    Serial.print(DRMs[k]);
-Serial.println("");
-Serial.println("--------------------------------");
-
+ Serial.println("");
+ Serial.println("--------------------------------");
 
  String binstr;
  BigNumber P = "11111111111111111111111111111111111111111";
@@ -80,9 +79,10 @@ Serial.println("--------------------------------");
 
  for (int i=0;i<keysize;i++)
  { 
-  /*
-   //Serial.println(DRMs[i]);
-   
+   Serial.println(i);
+   Serial.println(DRMs[i]);
+   Serial.println("-----------");
+  /* 
    if (DRMs[i] == "1")
     {
            Rs=ECAdd(Rs,Qs,P); 
@@ -94,7 +94,7 @@ Serial.println("--------------------------------");
   */  
            Qs = ECDouble(Qs,A,P);     
   
-  Serial.println(Qs.x);
+  //Serial.println(Qs.x);
  
  }
  
@@ -123,24 +123,24 @@ ECpoint ECDouble(ECpoint Q, BigNumber A, BigNumber P)
   ECpoint R;
   AC1 = Q.x * "3";
   AC2 = Q.y * "2";
-  //Serial.print("Q.x = ");
-  //Serial.println(Q.x);
+  Serial.print("Q.x = ");
+  Serial.println(Q.x);
 
   AC3 = inverse(AC2,P);
   AC3 = AC3%P;
-  //Serial.print("AC3 = ");
-  //Serial.println(AC3);
-  //Serial.print("checking = ");
-  //Serial.println(modulus((AC2 * AC3),P));
+  Serial.print("AC3 = ");
+  Serial.println(AC3);
+  Serial.print("checking = ");
+  Serial.println(modulus((AC2 * AC3),P));
   s1 = ((AC1*Q.x) + (A)) * AC3;
-  //Serial.print("s1 = ");
-  //Serial.println(s1);
+  Serial.print("s1 = ");
+  Serial.println(s1);
   BigNumber RR, RX = "0", RY;
   R.x = ((s1*s1)-(Q.x)-(Q.x))% P;
   R.y  = (s1*(Q.x-R.x)-Q.y)%P;
   R.x=(R.x <0 ? R.x+P : R.x);R.y= (R.y<0 ? R.y+P : R.y);
-  //Serial.print("R.x = ");
-  //Serial.println(R.x);
+  Serial.print("R.x = ");
+  Serial.println(R.x);
 
   return R;
 }
@@ -331,11 +331,3 @@ BigNumber modulus(BigNumber x, BigNumber y)
  return mod;
  
 }
-
-
-
-
-
-
-
-  
